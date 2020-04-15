@@ -5,11 +5,10 @@ authors = ["Sam Jones <email@spad.io>"]
 description = "Platform-agnostic Rust driver for the STMPE1600 I/O expander."
 readme = "README.md"
 edition = "2018"
-license = "GPL-3.0"
+license = "MIT OR Apache-2.0"
 categories = ["no-std", "embedded", "hardware-support"]
 keywords = ["embedded-hal", "io", "expander", "i2c", "driver"]
 repository = "https://github.com/Spadi0/stmpe1600-rs"
-homepage = "https://github.com/Spadi0/stmpe1600-rs"
 
 [dependencies]
 bitflags = "1.2"
