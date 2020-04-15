@@ -10,11 +10,9 @@ This driver can:
 
 ## Interrupts
 
-The STMPE1600 handles interrupts by triggering an interrupt output pin when it detects an interrupt on any of its configured interrupt pins. The active LOW interrupt pin needs to be handled by the microcontroller itself, and then call the [`handle_interrupt`] function to check the STMPE1600 for any pending interrupts, execute the relevent callbacks and clear the pending bits.
+The STMPE1600 handles interrupts by triggering an interrupt output pin when it detects an interrupt on any of its configured interrupt pins. The active LOW interrupt pin needs to be handled by the microcontroller itself, and then call the `handle_interrupt` function to check the STMPE1600 for any pending interrupts, execute the relevent callbacks and clear the pending bits.
 
 ## Usage
-
-See the [examples](examples/) directory for usage examples.
 
 ```rust
 use linux_embedded_hal::I2cdev;
@@ -34,3 +32,5 @@ fn main() {
 - [ ] Add interrupt polarity
 - [ ] Create a way to access each of the pins individually
 - [ ] Implement [`embedded_hal`] InputPin and OutputPin traits
+
+[`embedded-hal`]: https://github.com/rust-embedded/embedded-hal
