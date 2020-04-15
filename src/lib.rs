@@ -112,6 +112,17 @@ impl<I2C, E> Stmpe1600<I2C>
 		self.device.into_inner().i2c
 	}
 
+	/// Sets the interrupt polarity to active HIGH (rising edge output) or active LOW (falling edge output)
+	pub fn set_interrupt_polarity(&self, is_active_high: bool) -> Result<(), Error<E>> {
+		let mut buf = [0u8];
+		self.read_reg(Register::SystemControl, &mut buf)?;
+		if is_active_high {
+			self.write_reg(Register::SystemControl, buf[0] & !0b1)
+		} else {
+			self.write_reg(Register::SystemControl, buf[0] | 0b1)
+		}
+	}
+
 	/// Setup the specified pins as input pins.
 	pub fn setup_input_pins(&self, pins: PinFlag) -> Result<(), Error<E>> {
 		let mask = pins.bits();

@@ -29,7 +29,7 @@ fn main() {
 ```
 
 ## To-Do
-- [ ] Add interrupt polarity
+- [X] Add interrupt polarity
 - [ ] Create a way to access each of the pins individually
 - [ ] Implement [`embedded_hal`] InputPin and OutputPin traits
 
