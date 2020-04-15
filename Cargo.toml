@@ -1,0 +1,16 @@
+[package]
+name = "stmpe1600"
+version = "0.1.0"
+authors = ["Sam Jones <email@spad.io>"]
+description = "Platform-agnostic Rust driver for the STMPE1600 I/O expander."
+edition = "2018"
+keywords = ["embedded-hal", "no_std", "io", "expander"]
+
+[dependencies]
+bitflags = "1.2"
+embedded-hal = "0.2"
+
+[profile.release]
+codegen-units = 1
+debug = true
+lto = true
