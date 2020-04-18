@@ -11,7 +11,6 @@ keywords = ["embedded-hal", "io", "expander", "i2c", "driver"]
 repository = "https://github.com/Spadi0/stmpe1600-rs"
 
 [dependencies]
-bitflags = "1.2"
 embedded-hal = "0.2"
 
 [profile.release]
