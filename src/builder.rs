@@ -6,6 +6,7 @@ use embedded_hal::blocking::i2c::{Read, Write};
 use crate::{DEFAULT_ADDRESS, Error, InterruptPolarity, PinMode, Stmpe1600};
 use crate::device::{Register, Stmpe1600Device};
 
+/// A builder that allows for configuring all the various options available to edit on the STMPE1600.
 pub struct Stmpe1600Builder<I2C> {
 	i2c: I2C,
 	pins: [PinMode; 16],
@@ -17,6 +18,7 @@ pub struct Stmpe1600Builder<I2C> {
 impl<I2C, E> Stmpe1600Builder<I2C>
 	where I2C: Read<Error = E> + Write<Error = E>, E: Debug
 {
+	/// Constructs a builder.
 	pub fn new(i2c: I2C) -> Stmpe1600Builder<I2C> {
 		Stmpe1600Builder {
 			i2c,
@@ -27,17 +29,24 @@ impl<I2C, E> Stmpe1600Builder<I2C>
 		}
 	}
 
-	pub fn address(&mut self, address: u8) -> &mut Stmpe1600Builder<I2C> {
+	/// Sets the I²C address on which to attempt communication with the STMPE1600.
+	pub fn address(mut self, address: u8) -> Stmpe1600Builder<I2C> {
 		self.address = address;
 		self
 	}
 
-	pub fn pin(&mut self, pin: u8, mode: PinMode) -> &mut Stmpe1600Builder<I2C> {
+	/// Sets the mode of the specified pin. Defaults to [`Input`](enum.PinMode.html#variant.Input).
+	/// 
+	/// To edit multiple pins at once, see [`pins`](#method.pins).
+	pub fn pin(mut self, pin: u8, mode: PinMode) -> Stmpe1600Builder<I2C> {
 		self.set_pin(pin, mode);
 		self
 	}
 
-	pub fn pins<I>(&mut self, pins: I, mode: PinMode) -> &mut Stmpe1600Builder<I2C>
+	/// Sets the mode of multiple pins at once. Defaults to [`Input`](enum.PinMode.html#variant.Input).
+	/// 
+	/// To edit a single pin, see [`pin`](#method.pin).
+	pub fn pins<I>(mut self, pins: I, mode: PinMode) -> Stmpe1600Builder<I2C>
 		where I: IntoIterator<Item = u8>
 	{
 		for pin in pins {
@@ -46,12 +55,15 @@ impl<I2C, E> Stmpe1600Builder<I2C>
 		self
 	}
 
-	pub fn interrupts(&mut self, polarity: InterruptPolarity) -> &mut Stmpe1600Builder<I2C> {
+	/// Enables interrupts, and sets the polarity of the interrupt output pin.
+	pub fn interrupts(mut self, polarity: InterruptPolarity) -> Stmpe1600Builder<I2C> {
 		self.use_interrupts = true;
 		self.interrupt_polarity = polarity;
 		self
 	}
 
+
+	/// Consumes the builder, and produces an [`Stmpe1600`](struct.Stmpe1600.html) struct.
 	pub fn build(self) -> Result<Stmpe1600<I2C>, Error<E>> {
 		let mut device = Stmpe1600Device::new(self.i2c, self.address)?;
 
@@ -84,21 +96,3 @@ impl<I2C, E> Stmpe1600Builder<I2C>
 		self.pins[pin as usize] = mode;
 	}
 }
-
-// fn main() {
-// 	let stmpe1600 =
-// 		Stmpe1600::builder(i2c)
-// 			.address(0x42)
-// 			.pin(8, PinMode::Input)
-// 			.pins(9..16, PinMode::Interrupt)
-// 			.enable_interrupts()
-// 			.build().unwrap();
-// }
-
-// fn EXTI9_5() {
-// 	stmpe1600.get_interrupts();
-// 	[false, false, false, true, false, ...]
-// 	if interrupts[8] {
-
-// 	}
-// }
