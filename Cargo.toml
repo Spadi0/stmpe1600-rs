@@ -12,8 +12,3 @@ repository = "https://github.com/Spadi0/stmpe1600-rs"
 
 [dependencies]
 embedded-hal = "0.2"
-
-[profile.release]
-codegen-units = 1
-debug = true
-lto = true
