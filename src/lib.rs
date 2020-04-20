@@ -17,7 +17,9 @@
 //! ```
 //! 
 //! # Accessing I/O
-//! TODO: implement me
+//! To read or write individual pins, use the [`get()`](struct.Stmpe1600.html#method.get) and [`set()`](struct.Stmpe1600.html#method.get)
+//! functions respectively. To read or write all the pins at once, use the [`get_all()`](struct.Stmpe1600.html#method.get_all) and
+//! [`set_all()`](struct.Stmpe1600.html#method.set_all) functions instead.
 //! 
 //! # Examples
 //! ## Connecting to a device with a custom I²C address
@@ -42,6 +44,40 @@
 //! 	.pins(0..16, PinMode::Output)
 //! 	.build()
 //! 	.expect("Could not initialise STMPE1600 driver");
+//! ```
+//! 
+//! ## Read and write individual pins
+//! ```rust,no_run
+//! use linux_embedded_hal::I2cdev;
+//! use stmpe1600::{PinMode, Stmpe1600Builder};
+//! 
+//! let dev = I2cdev::new("/dev/i2c-1").unwrap();
+//! let stmpe1600 = Stmpe1600Builder::new(dev)
+//! 	.pin(1, PinMode::Output)
+//! 	.build()
+//! 	.expect("Could not initialise STMPE1600 driver");
+//! 
+//! // Get the status of pin 0
+//! let pin_status = stmpe1600.get(0)?;
+//! // Set the status of pin 1 to the status of pin 0
+//! stmpe1600.set(1, pin_status);
+//! ```
+//! 
+//! ## Read and write multiple pins
+//! ```rust,no_run
+//! use linux_embedded_hal::I2cdev;
+//! use stmpe1600::{PinMode, Stmpe1600Builder};
+//! 
+//! let dev = I2cdev::new("/dev/i2c-1").unwrap();
+//! let stmpe1600 = Stmpe1600Builder::new(dev)
+//! 	.pins(2..=3, PinMode::Output)
+//! 	.build()
+//! 	.expect("Could not initialise STMPE1600 driver");
+//! 
+//! // Get the status of all the pins
+//! let pins = stmpe1600.get_all()?;
+//! // Set the status of pin 0 -> pin 2, and the status of pin 1 -> pin 3
+//! stmpe1600.set_all((pins & 0b11) << 2);
 //! ```
 
 #![no_std]
@@ -96,6 +132,51 @@ pub enum Error<E>
 impl<I2C, E> Stmpe1600<I2C>
 	where I2C: Read<Error = E> + Write<Error = E>, E: Debug
 {
+	/// Gets the current state of the specified pin.
+	/// 
+	/// To get the state of all the pins at once, see [`get_all`](#method.get_all).
+	pub fn get(&self, pin: u8) -> Result<bool, Error<E>> {
+		assert!(pin < 16);
+		let gpmr = self.device.borrow_mut().read_reg(Register::GPMR)?;
+		Ok(gpmr & (1 << pin) == 1 << pin)
+	}
+
+	/// Gets the current state of the all pins.
+	/// 
+	/// To get the state a single pin, see [`get`](#method.get).
+	pub fn get_all<I>(&self) -> Result<[bool; 16], Error<E>> {
+		let mut device = self.device.borrow_mut();
+		let mut buf = [false; 16];
+		for pin in 0..16 {
+			assert!(pin < 16);
+			let gpmr = device.read_reg(Register::GPMR)?;
+			buf[pin] = gpmr & (1 << pin) == 1 << pin;
+		}
+		Ok(buf)
+	}
+
+	/// Sets the current state of the specified pin.
+	/// 
+	/// To set the state of all the pins at once, see [`set_all`](#method.set_all).
+	pub fn set(&self, pin: u8, value: bool) -> Result<(), Error<E>> {
+		assert!(pin < 16);
+		let mut device = self.device.borrow_mut();
+		let gpsr = device.read_reg(Register::GPSR)?;
+		if value {
+			device.write_reg(Register::GPSR, gpsr | (1 << pin))?;
+		} else {
+			device.write_reg(Register::GPSR, gpsr & !(1 << pin))?;
+		}
+		Ok(())
+	}
+
+	/// Sets the current state of the all the pins.
+	/// 
+	/// To set the state a single pin, see [`set`](#method.set).
+	pub fn set_all(&self, mask: u16) -> Result<(), Error<E>> {
+		self.device.borrow_mut().write_reg(Register::GPSR, mask)
+	}
+
 	/// Gets the pending interrupts and returns them in an array.
 	/// 
 	/// This function clears any pending bits from the STMPE1600,
