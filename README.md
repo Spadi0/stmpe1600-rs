@@ -1,39 +1,27 @@
 # STMPE1600 I/O Expander Rust Driver
 
+[![Crate](https://img.shields.io/crates/v/stmpe1600.svg)](https://crates.io/crates/stmpe1600)
+[![Docs](https://docs.rs/stmpe1600/badge.svg)](https://docs.rs/stmpe1600)
+
 This is a platform-agnostic Rust driver for the [STMPE1600 I/O expander](https://www.st.com/en/interfaces-and-transceivers/stmpe1600.html).
 
 This driver can:
 - Setup the pins as input, output or interrupt pins.
-- Get the state of all the pins at once.
-- Set the state of all the pins at once.
-- Have an interrupt callback which is triggered on interrupt.
+- Get/set the state of a specific pin.
+- Get/set the state of all the pins at once.
+- Enable interrupt capability.
+- Set the interrupt output polarity.
 
 ## Interrupts
 
-The STMPE1600 handles interrupts by triggering an interrupt output pin when it detects an interrupt on any of its configured interrupt pins. The active LOW interrupt pin needs to be handled by the microcontroller itself, and then call the `handle_interrupt` function to check the STMPE1600 for any pending interrupts, execute the relevent callbacks and clear the pending bits.
-
-## Usage
-
-```rust
-use linux_embedded_hal::I2cdev;
-use stmpe1600::{PinFlag, Stmpe1600};
-
-fn main() {
-	let i2c = I2cdev::new("/dev/i2c-1").unwrap();
-	let expander = Stmpe1600::new(i2c).unwrap();
-	expander.setup_output_pins(PinFlag::P0).unwrap();
-	expander.set_state(PinFlag::P0).unwrap();
-
-	println!("Pin Status: {:?}" expander.get_state().unwrap())
-}
-```
+The STMPE1600 handles interrupts by triggering an interrupt output pin when it detects an interrupt on any of its configured interrupt pins.
+The polarity of the interrupt output pin can be configured to be HIGH or LOW, and when the interrupt is triggered, the microcontroller can
+get any pending interrupts by calling `get_interrupts`, which will also clear the pending interrupts on the STMPE1600 itself.
 
 ## To-Do
 - [X] Add interrupt polarity
-- [ ] Create a way to access each of the pins individually
-- [ ] Implement [`embedded_hal`] InputPin and OutputPin traits
-
-[`embedded-hal`]: https://github.com/rust-embedded/embedded-hal
+- [X] Create a way to access each of the pins individually
+- [ ] Implement [`embedded_hal`](https://github.com/rust-embedded/embedded-hal) InputPin and OutputPin traits
 
 ## License
 
