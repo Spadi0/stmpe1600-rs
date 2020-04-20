@@ -21,7 +21,7 @@
 //! 
 //! # Examples
 //! ## Connecting to a device with a custom I²C address
-//! ```ignore
+//! ```rust,no_run
 //! use linux_embedded_hal::I2cdev;
 //! use stmpe1600::Stmpe1600Builder;
 //! 
@@ -33,7 +33,7 @@
 //! ```
 //! 
 //! ## Setting all the pins to output mode
-//! ```ignore
+//! ```rust,no_run
 //! use linux_embedded_hal::I2cdev;
 //! use stmpe1600::{PinMode, Stmpe1600Builder};
 //! 
@@ -45,6 +45,7 @@
 //! ```
 
 #![no_std]
+#![warn(missing_docs)]
 
 use core::fmt::Debug;
 use core::cell::RefCell;
@@ -65,6 +66,7 @@ pub struct Stmpe1600<I2C> {
 }
 
 /// The types that the pins on the STMPE1600 may be configured as.
+#[allow(missing_docs)]
 #[derive(Clone, Copy, Debug)]
 pub enum PinMode {
 	Input,
@@ -73,6 +75,7 @@ pub enum PinMode {
 }
 
 /// Tells the STMPE1600 what value the interrupt output pin should be set to, when an interrupt is triggered.
+#[allow(missing_docs)]
 #[derive(Clone, Copy, Debug)]
 pub enum InterruptPolarity {
 	Low,
