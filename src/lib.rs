@@ -144,7 +144,7 @@ impl<I2C, E> Stmpe1600<I2C>
 	/// Gets the current state of the all pins.
 	/// 
 	/// To get the state a single pin, see [`get`](#method.get).
-	pub fn get_all<I>(&self) -> Result<[bool; 16], Error<E>> {
+	pub fn get_all(&self) -> Result<[bool; 16], Error<E>> {
 		let mut device = self.device.borrow_mut();
 		let mut buf = [false; 16];
 		for pin in 0..16 {

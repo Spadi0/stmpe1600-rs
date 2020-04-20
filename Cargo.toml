@@ -1,6 +1,6 @@
 [package]
 name = "stmpe1600"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Sam Jones <email@spad.io>"]
 description = "Platform-agnostic Rust driver for the STMPE1600 I/O expander."
 readme = "README.md"
