@@ -90,20 +90,17 @@ use embedded_hal::blocking::i2c::{Read, Write};
 mod builder;
 pub use builder::Stmpe1600Builder;
 mod device;
-use device::{Register, Stmpe1600Device};
+pub use device::Register;
+use device::Stmpe1600Device;
+mod pins;
+pub use pins::Pin;
 
 /// The default I²C address for the STMPE1600.
 pub const DEFAULT_ADDRESS: u8 = 0x42;
 
-/// A struct representing the STMPE1600 device driver.
-#[derive(Debug)]
-pub struct Stmpe1600<I2C> {
-	device: RefCell<Stmpe1600Device<I2C>>
-}
-
 /// The types that the pins on the STMPE1600 may be configured as.
 #[allow(missing_docs)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PinMode {
 	Input,
 	Output,
@@ -127,6 +124,15 @@ pub enum Error<E>
 	I2CError(E),
 	/// Invalid device ID
 	InvalidDeviceID,
+	/// Attmepted to get the value of an output, or set the value of an input or an interrupt
+	IncorrectPinMode,
+}
+
+/// A struct representing the STMPE1600 device driver.
+#[derive(Debug)]
+pub struct Stmpe1600<I2C> {
+	device: RefCell<Stmpe1600Device<I2C>>,
+	pins: [PinMode; 16],
 }
 
 impl<I2C, E> Stmpe1600<I2C>
@@ -177,18 +183,19 @@ impl<I2C, E> Stmpe1600<I2C>
 		self.device.borrow_mut().write_reg(Register::GPSR, mask)
 	}
 
+	/// Create a [`Pin`](struct.Pin.html) which corresponds to the specified pin.
+	/// The returned `Pin` implements both `InputPin` and `OutputPin`, however,
+	/// if the `InputPin` functions are attempted to be used on an output pin, or vise versa,
+	/// the function will always fail (by returning an `Err`).
+	pub fn pin<'a>(&'a self, pin_number: u8) -> Pin<I2C> {
+		Pin::new(self, pin_number)
+	}
+
 	/// Gets the pending interrupts and returns them in an array.
 	/// 
 	/// This function clears any pending bits from the STMPE1600,
 	/// and in doing so, stops triggering the interrupt output pin.
 	pub fn get_interrupts(&self) -> Result<[bool; 16], Error<E>> {
-		let mask = self.device.borrow_mut().read_reg(Register::ISGPIOR)?;
-		let mut arr = [false; 16];
-		for i in 0..16 {
-			if mask & 1 << i == 1 << i {
-				arr[i] = true;
-			}
-		}
-		Ok(arr)
+		self.device.borrow_mut().get_interrupts()	
 	}
 }

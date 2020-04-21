@@ -6,14 +6,23 @@ const DEVICE_ID: u16 = 0x0016;
 
 #[allow(non_camel_case_types, dead_code)]
 #[repr(u8)]
-pub(crate) enum Register {
+/// The different adresses of the registers on the STMPE1600's I²C bus.
+pub enum Register {
+	/// ID unique to the STMPE1600
 	ChipID = 0x00,
+	/// Reset and interrupt control
 	SystemControl = 0x03,
+	/// GPIO interrupt enable register 
 	IEGPIOR = 0x08,
+	/// GPIO interrupt status register
 	ISGPIOR = 0x0A,
+	/// GPIO monitor pin state register
 	GPMR = 0x10,
+	/// GPIO set pin state register
 	GPSR = 0x12,
+	/// GPIO set pin direction register
 	GPDR = 0x14,
+	/// GPIO polarity inversion register
 	GPPIR = 0x16,
 }
 
@@ -41,6 +50,17 @@ impl<I2C, E> Stmpe1600Device<I2C>
 
 	pub fn write_reg(&mut self, register: Register, value: u16) -> Result<(), Error<E>> {
 		self.i2c.write(self.address, &[register as u8, value as u8, (value >> 8) as u8]).map_err(Error::I2CError)
+	}
+
+	pub fn get_interrupts(&mut self) -> Result<[bool; 16], Error<E>> {
+		let mask = self.read_reg(Register::ISGPIOR)?;
+		let mut arr = [false; 16];
+		for i in 0..16 {
+			if mask & 1 << i == 1 << i {
+				arr[i] = true;
+			}
+		}
+		Ok(arr)
 	}
 
 	fn init(&mut self) -> Result<(), Error<E>> {

@@ -88,7 +88,10 @@ impl<I2C, E> Stmpe1600Builder<I2C>
 			device.write_reg(Register::SystemControl, scb | 0x04 | polarity)?;
 		}
 
-		Ok(Stmpe1600 { device: RefCell::new(device) })
+		Ok(Stmpe1600 {
+			device: RefCell::new(device),
+			pins: self.pins,
+		})
 	}
 
 	fn set_pin(&mut self, pin: u8, mode: PinMode) {
