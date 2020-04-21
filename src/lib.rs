@@ -5,7 +5,7 @@
 //! so that when they are triggered, they send a signal (of a configurable polarity) through the interrupt output pin.
 //! 
 //! This driver is intended to work on any embedded platform, by using the [`embedded-hal`](https://crates.io/crates/embedded-hal) library.
-//! This works by using the I²C traits of embedded-hal, which allows for a specific HAL (hardware abstraction layer) to provide its own interface
+//! This works by using the I²C traits of `embedded-hal`, which allows for a specific HAL (hardware abstraction layer) to provide its own interface
 //! to allow using the specific implentation of I²C necessary to work on a specific device.
 //! 
 //! # Driver construction
@@ -17,9 +17,9 @@
 //! ```
 //! 
 //! # Accessing I/O
-//! To read or write individual pins, use the [`get()`](struct.Stmpe1600.html#method.get) and [`set()`](struct.Stmpe1600.html#method.get)
-//! functions respectively. To read or write all the pins at once, use the [`get_all()`](struct.Stmpe1600.html#method.get_all) and
-//! [`set_all()`](struct.Stmpe1600.html#method.set_all) functions instead.
+//! To access the I/O pins, call the [`pin()`](struct.Stmpe1600.html#method.pin) function, which returns a [`Pin`](struct.Pin.html).
+//! This type implements the `embedded-hal` GPIO traits, `InputPin` and `OutputPin`, which means that they can also be passed to any
+//! function which takes these types as arguments. This allows these pins to be passed transparently to platform-agnostic drivers easily and efficiently.
 //! 
 //! # Examples
 //! ## Connecting to a device with a custom I²C address
