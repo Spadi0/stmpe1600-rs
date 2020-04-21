@@ -23,7 +23,7 @@
 //! 
 //! # Examples
 //! ## Connecting to a device with a custom I²C address
-//! ```rust,no_run
+//! ```rust,ignore
 //! use linux_embedded_hal::I2cdev;
 //! use stmpe1600::Stmpe1600Builder;
 //! 
@@ -35,7 +35,7 @@
 //! ```
 //! 
 //! ## Setting all the pins to output mode
-//! ```rust,no_run
+//! ```rust,ignore
 //! use linux_embedded_hal::I2cdev;
 //! use stmpe1600::{PinMode, Stmpe1600Builder};
 //! 
@@ -47,7 +47,7 @@
 //! ```
 //! 
 //! ## Read and write individual pins
-//! ```rust,no_run
+//! ```rust,ignore
 //! use linux_embedded_hal::I2cdev;
 //! use stmpe1600::{PinMode, Stmpe1600Builder};
 //! 
@@ -64,7 +64,7 @@
 //! ```
 //! 
 //! ## Read and write multiple pins
-//! ```rust,no_run
+//! ```rust,ignore
 //! use linux_embedded_hal::I2cdev;
 //! use stmpe1600::{PinMode, Stmpe1600Builder};
 //! 
