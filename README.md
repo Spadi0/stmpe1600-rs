@@ -21,7 +21,7 @@ get any pending interrupts by calling `get_interrupts`, which will also clear th
 ## To-Do
 - [X] Add interrupt polarity
 - [X] Create a way to access each of the pins individually
-- [ ] Implement [`embedded_hal`](https://github.com/rust-embedded/embedded-hal) InputPin and OutputPin traits
+- [X] Implement [`embedded_hal`] InputPin and OutputPin traits
 
 ## License
 

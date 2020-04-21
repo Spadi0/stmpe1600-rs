@@ -46,38 +46,27 @@
 //! 	.expect("Could not initialise STMPE1600 driver");
 //! ```
 //! 
-//! ## Read and write individual pins
+//! ## Read and write I/O pins
 //! ```rust,ignore
+//! use embedded_hal::digital::v2::{InputPin, OutputPin};
 //! use linux_embedded_hal::I2cdev;
 //! use stmpe1600::{PinMode, Stmpe1600Builder};
 //! 
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let stmpe1600 = Stmpe1600Builder::new(dev)
+//! 	// The pins default to input, so we don't need to configure pin 0 here
 //! 	.pin(1, PinMode::Output)
 //! 	.build()
 //! 	.expect("Could not initialise STMPE1600 driver");
 //! 
-//! // Get the status of pin 0
-//! let pin_status = stmpe1600.get(0)?;
-//! // Set the status of pin 1 to the status of pin 0
-//! stmpe1600.set(1, pin_status);
-//! ```
+//! let input_pin = stmpe1600.pin(0);
+//! let output_pin = stmpe1600.pin(1);
 //! 
-//! ## Read and write multiple pins
-//! ```rust,ignore
-//! use linux_embedded_hal::I2cdev;
-//! use stmpe1600::{PinMode, Stmpe1600Builder};
-//! 
-//! let dev = I2cdev::new("/dev/i2c-1").unwrap();
-//! let stmpe1600 = Stmpe1600Builder::new(dev)
-//! 	.pins(2..=3, PinMode::Output)
-//! 	.build()
-//! 	.expect("Could not initialise STMPE1600 driver");
-//! 
-//! // Get the status of all the pins
-//! let pins = stmpe1600.get_all()?;
-//! // Set the status of pin 0 -> pin 2, and the status of pin 1 -> pin 3
-//! stmpe1600.set_all((pins & 0b11) << 2);
+//! if input_pin.is_high()? {
+//! 	output_pin.set_high()?
+//! } else {
+//! 	output_pin.set_low()?;
+//! }
 //! ```
 
 #![no_std]
@@ -141,6 +130,7 @@ impl<I2C, E> Stmpe1600<I2C>
 	/// Gets the current state of the specified pin.
 	/// 
 	/// To get the state of all the pins at once, see [`get_all`](#method.get_all).
+	#[deprecated(since = "1.1.0", note = "Use the `Stmpe1600::pin` function instead to get a `Pin`, which implements the `embedded-hal` traits for GPIO pins.")]
 	pub fn get(&self, pin: u8) -> Result<bool, Error<E>> {
 		assert!(pin < 16);
 		let gpmr = self.device.borrow_mut().read_reg(Register::GPMR)?;
@@ -150,6 +140,7 @@ impl<I2C, E> Stmpe1600<I2C>
 	/// Gets the current state of the all pins.
 	/// 
 	/// To get the state a single pin, see [`get`](#method.get).
+	#[deprecated(since = "1.1.0", note = "Use the `Stmpe1600::pin` function instead to get a `Pin`, which implements the `embedded-hal` traits for GPIO pins.")]
 	pub fn get_all(&self) -> Result<[bool; 16], Error<E>> {
 		let mut device = self.device.borrow_mut();
 		let mut buf = [false; 16];
@@ -164,6 +155,7 @@ impl<I2C, E> Stmpe1600<I2C>
 	/// Sets the current state of the specified pin.
 	/// 
 	/// To set the state of all the pins at once, see [`set_all`](#method.set_all).
+	#[deprecated(since = "1.1.0", note = "Use the `Stmpe1600::pin` function instead to get a `Pin`, which implements the `embedded-hal` traits for GPIO pins.")]
 	pub fn set(&self, pin: u8, value: bool) -> Result<(), Error<E>> {
 		assert!(pin < 16);
 		let mut device = self.device.borrow_mut();
@@ -179,6 +171,7 @@ impl<I2C, E> Stmpe1600<I2C>
 	/// Sets the current state of the all the pins.
 	/// 
 	/// To set the state a single pin, see [`set`](#method.set).
+	#[deprecated(since = "1.1.0", note = "Use the `Stmpe1600::pin` function instead to get a `Pin`, which implements the `embedded-hal` traits for GPIO pins.")]
 	pub fn set_all(&self, mask: u16) -> Result<(), Error<E>> {
 		self.device.borrow_mut().write_reg(Register::GPSR, mask)
 	}
