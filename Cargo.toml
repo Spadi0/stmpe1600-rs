@@ -12,3 +12,6 @@ repository = "https://github.com/Spadi0/stmpe1600-rs"
 
 [dependencies]
 embedded-hal = { version = "0.2", features = ["unproven"] }
+
+[dev-dependencies]
+embedded-hal-mock = "0.7"
