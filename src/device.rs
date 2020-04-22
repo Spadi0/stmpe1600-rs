@@ -2,7 +2,7 @@ use core::fmt::Debug;
 use embedded_hal::blocking::i2c::{Read, Write};
 use crate::Error;
 
-const DEVICE_ID: u16 = 0x0016;
+const DEVICE_ID: u16 = 0x1600;
 
 #[allow(non_camel_case_types, dead_code)]
 #[repr(u8)]
@@ -47,9 +47,20 @@ impl<I2C, E> Stmpe1600Device<I2C>
 		self.i2c.read(self.address, &mut buffer).map_err(Error::I2CError)?;
 		Ok((buffer[1] as u16) << 8 | buffer[0] as u16)
 	}
+	
+	pub fn read_reg8(&mut self, register: Register) -> Result<u8, Error<E>> {
+		self.i2c.write(self.address, &[register as u8]).map_err(Error::I2CError)?;
+		let mut buffer = [0u8];
+		self.i2c.read(self.address, &mut buffer).map_err(Error::I2CError)?;
+		Ok(buffer[0])
+	}
 
 	pub fn write_reg(&mut self, register: Register, value: u16) -> Result<(), Error<E>> {
 		self.i2c.write(self.address, &[register as u8, value as u8, (value >> 8) as u8]).map_err(Error::I2CError)
+	}
+
+	pub fn write_reg8(&mut self, register: Register, value: u8) -> Result<(), Error<E>> {
+		self.i2c.write(self.address, &[register as u8, value as u8]).map_err(Error::I2CError)
 	}
 
 	pub fn get_interrupts(&mut self) -> Result<[bool; 16], Error<E>> {
@@ -69,9 +80,7 @@ impl<I2C, E> Stmpe1600Device<I2C>
 		}
 
 		// Do a software reset
-		self.write_reg(Register::SystemControl, 0x80)?;
-		// Clear the input pin status register
-		self.read_reg(Register::GPMR)?;
+		self.write_reg8(Register::SystemControl, 0x80)?;
 
 		Ok(())
 	}

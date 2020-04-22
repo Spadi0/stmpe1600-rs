@@ -80,12 +80,12 @@ impl<I2C, E> Stmpe1600Builder<I2C>
 		device.write_reg(Register::IEGPIOR, iegpior)?;
 
 		if self.use_interrupts {
-			let scb = device.read_reg(Register::SystemControl)?;
+			let scb = device.read_reg8(Register::SystemControl)?;
 			let polarity = match self.interrupt_polarity {
 				InterruptPolarity::Low => 0x00,
 				InterruptPolarity::High => 0x01,
 			};
-			device.write_reg(Register::SystemControl, scb | 0x04 | polarity)?;
+			device.write_reg8(Register::SystemControl, scb | 0x04 | polarity)?;
 		}
 
 		Ok(Stmpe1600 {

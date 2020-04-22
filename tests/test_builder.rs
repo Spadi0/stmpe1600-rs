@@ -5,10 +5,8 @@ use embedded_hal_mock::i2c::{Mock as I2cMock, Transaction as I2cTransaction};
 fn basic_builder() {
 	let expectations = [
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::ChipID as u8]),
-		I2cTransaction::read(DEFAULT_ADDRESS, vec![0x16, 0x00]),
-		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::SystemControl as u8, 0x80, 0x00]),
-		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::GPMR as u8]),
-		I2cTransaction::read(DEFAULT_ADDRESS, vec![0x00, 0x00]),
+		I2cTransaction::read(DEFAULT_ADDRESS, vec![0x00, 0x16]),
+		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::SystemControl as u8, 0x80]),
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::GPDR as u8, 0x00, 0x00]),
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::IEGPIOR as u8, 0x00, 0x00]),
 	];
@@ -20,10 +18,8 @@ fn basic_builder() {
 fn custom_address_builder() {
 	let expectations = [
 		I2cTransaction::write(0x43, vec![Register::ChipID as u8]),
-		I2cTransaction::read(0x43, vec![0x16, 0x00]),
-		I2cTransaction::write(0x43, vec![Register::SystemControl as u8, 0x80, 0x00]),
-		I2cTransaction::write(0x43, vec![Register::GPMR as u8]),
-		I2cTransaction::read(0x43, vec![0x00, 0x00]),
+		I2cTransaction::read(0x43, vec![0x00, 0x16]),
+		I2cTransaction::write(0x43, vec![Register::SystemControl as u8, 0x80]),
 		I2cTransaction::write(0x43, vec![Register::GPDR as u8, 0x00, 0x00]),
 		I2cTransaction::write(0x43, vec![Register::IEGPIOR as u8, 0x00, 0x00]),
 	];
@@ -38,10 +34,8 @@ fn custom_address_builder() {
 fn pin_mode_builder() {
 	let expectations = [
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::ChipID as u8]),
-		I2cTransaction::read(DEFAULT_ADDRESS, vec![0x16, 0x00]),
-		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::SystemControl as u8, 0x80, 0x00]),
-		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::GPMR as u8]),
-		I2cTransaction::read(DEFAULT_ADDRESS, vec![0x00, 0x00]),
+		I2cTransaction::read(DEFAULT_ADDRESS, vec![0x00, 0x16]),
+		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::SystemControl as u8, 0x80]),
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::GPDR as u8, 0x02, 0xFF]),
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::IEGPIOR as u8, 0x04, 0x00]),
 	];
