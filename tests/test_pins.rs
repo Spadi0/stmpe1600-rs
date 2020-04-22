@@ -48,7 +48,7 @@ fn write_pin() {
 }
 
 #[test]
-#[should_panic]
+#[should_panic(expected = "called `Result::unwrap()` on an `Err` value: IncorrectPinMode")]
 fn read_from_output_pin() {
 	let expectations = [
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::ChipID as u8]),
