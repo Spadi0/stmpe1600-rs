@@ -86,6 +86,8 @@ impl<I2C, E> Stmpe1600Builder<I2C>
 				InterruptPolarity::High => 0x01,
 			};
 			device.write_reg8(Register::SystemControl, scb | 0x04 | polarity)?;
+			// Clear pin input register
+			device.read_reg(Register::GPMR)?;
 		}
 
 		Ok(Stmpe1600 {
