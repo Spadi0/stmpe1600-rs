@@ -1,6 +1,6 @@
+use crate::Error;
 use core::fmt::Debug;
 use embedded_hal::blocking::i2c::{Read, Write};
-use crate::Error;
 
 const DEVICE_ID: u16 = 0x1600;
 
@@ -12,7 +12,7 @@ pub enum Register {
 	ChipID = 0x00,
 	/// Reset and interrupt control
 	SystemControl = 0x03,
-	/// GPIO interrupt enable register 
+	/// GPIO interrupt enable register
 	IEGPIOR = 0x08,
 	/// GPIO interrupt status register
 	ISGPIOR = 0x0A,
@@ -33,34 +33,51 @@ pub(crate) struct Stmpe1600Device<I2C> {
 }
 
 impl<I2C, E> Stmpe1600Device<I2C>
-	where I2C: Read<Error = E> + Write<Error = E>, E: Debug
+where
+	I2C: Read<Error = E> + Write<Error = E>,
+	E: Debug,
 {
 	pub fn new(i2c: I2C, address: u8) -> Result<Stmpe1600Device<I2C>, Error<E>> {
 		let mut device = Stmpe1600Device { i2c, address };
 		device.init()?;
 		Ok(device)
 	}
-	
+
 	pub fn read_reg(&mut self, register: Register) -> Result<u16, Error<E>> {
-		self.i2c.write(self.address, &[register as u8]).map_err(Error::I2CError)?;
+		self.i2c
+			.write(self.address, &[register as u8])
+			.map_err(Error::I2CError)?;
 		let mut buffer = [0u8; 2];
-		self.i2c.read(self.address, &mut buffer).map_err(Error::I2CError)?;
+		self.i2c
+			.read(self.address, &mut buffer)
+			.map_err(Error::I2CError)?;
 		Ok((buffer[1] as u16) << 8 | buffer[0] as u16)
 	}
-	
+
 	pub fn read_reg8(&mut self, register: Register) -> Result<u8, Error<E>> {
-		self.i2c.write(self.address, &[register as u8]).map_err(Error::I2CError)?;
+		self.i2c
+			.write(self.address, &[register as u8])
+			.map_err(Error::I2CError)?;
 		let mut buffer = [0u8];
-		self.i2c.read(self.address, &mut buffer).map_err(Error::I2CError)?;
+		self.i2c
+			.read(self.address, &mut buffer)
+			.map_err(Error::I2CError)?;
 		Ok(buffer[0])
 	}
 
 	pub fn write_reg(&mut self, register: Register, value: u16) -> Result<(), Error<E>> {
-		self.i2c.write(self.address, &[register as u8, value as u8, (value >> 8) as u8]).map_err(Error::I2CError)
+		self.i2c
+			.write(
+				self.address,
+				&[register as u8, value as u8, (value >> 8) as u8],
+			)
+			.map_err(Error::I2CError)
 	}
 
 	pub fn write_reg8(&mut self, register: Register, value: u8) -> Result<(), Error<E>> {
-		self.i2c.write(self.address, &[register as u8, value as u8]).map_err(Error::I2CError)
+		self.i2c
+			.write(self.address, &[register as u8, value as u8])
+			.map_err(Error::I2CError)
 	}
 
 	pub fn get_interrupts(&mut self) -> Result<[bool; 16], Error<E>> {

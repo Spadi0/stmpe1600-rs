@@ -3,11 +3,11 @@
 //! The STMPE1600 is a device that provide 16 GPIO pins, which are configurable through software as
 //! either floating input or push-pull output. The pins can also be configured to use interrupts,
 //! so that when they are triggered, they send a signal (of a configurable polarity) through the interrupt output pin.
-//! 
+//!
 //! This driver is intended to work on any embedded platform, by using the [`embedded-hal`](https://crates.io/crates/embedded-hal) library.
 //! This works by using the I²C traits of `embedded-hal`, which allows for a specific HAL (hardware abstraction layer) to provide its own interface
 //! to allow using the specific implentation of I²C necessary to work on a specific device.
-//! 
+//!
 //! # Driver construction
 //! To construct the driver, you will need to use the [`Stmpe1600Builder`](struct.Stmpe1600Builder.html) struct.
 //! For more information on what configuration options can be changed, view the `Stmpe1600Builder` documentation.
@@ -15,53 +15,53 @@
 //! let i2c = /* construct something implementing embedded_hal::blocking::i2c::{Read, Write} */;
 //! let stmpe1600 = Stmpe1600Builder::new(i2c).build()?;
 //! ```
-//! 
+//!
 //! # Accessing I/O
 //! To access the I/O pins, call the [`pin()`](struct.Stmpe1600.html#method.pin) function, which returns a [`Pin`](struct.Pin.html).
 //! This type implements the `embedded-hal` GPIO traits, `InputPin` and `OutputPin`, which means that they can also be passed to any
 //! function which takes these types as arguments. This allows these pins to be passed transparently to platform-agnostic drivers easily and efficiently.
-//! 
+//!
 //! # Examples
 //! ## Connecting to a device with a custom I²C address
 //! ```rust,ignore
 //! use linux_embedded_hal::I2cdev;
 //! use stmpe1600::Stmpe1600Builder;
-//! 
+//!
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let stmpe1600 = Stmpe1600Builder::new(dev)
 //! 	.address(0x43)
 //! 	.build()
 //! 	.expect("Could not initialise STMPE1600 driver");
 //! ```
-//! 
+//!
 //! ## Setting all the pins to output mode
 //! ```rust,ignore
 //! use linux_embedded_hal::I2cdev;
 //! use stmpe1600::{PinMode, Stmpe1600Builder};
-//! 
+//!
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let stmpe1600 = Stmpe1600Builder::new(dev)
 //! 	.pins(0..16, PinMode::Output)
 //! 	.build()
 //! 	.expect("Could not initialise STMPE1600 driver");
 //! ```
-//! 
+//!
 //! ## Read and write I/O pins
 //! ```rust,ignore
 //! use embedded_hal::digital::v2::{InputPin, OutputPin};
 //! use linux_embedded_hal::I2cdev;
 //! use stmpe1600::{PinMode, Stmpe1600Builder};
-//! 
+//!
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let stmpe1600 = Stmpe1600Builder::new(dev)
 //! 	// The pins default to input, so we don't need to configure pin 0 here
 //! 	.pin(1, PinMode::Output)
 //! 	.build()
 //! 	.expect("Could not initialise STMPE1600 driver");
-//! 
+//!
 //! let input_pin = stmpe1600.pin(0);
 //! let output_pin = stmpe1600.pin(1);
-//! 
+//!
 //! if input_pin.is_high()? {
 //! 	output_pin.set_high()?
 //! } else {
@@ -72,8 +72,8 @@
 #![no_std]
 #![warn(missing_docs)]
 
-use core::fmt::Debug;
 use core::cell::RefCell;
+use core::fmt::Debug;
 use embedded_hal::blocking::i2c::{Read, Write};
 
 mod builder;
@@ -93,7 +93,7 @@ pub const DEFAULT_ADDRESS: u8 = 0x42;
 pub enum PinMode {
 	Input,
 	Output,
-	Interrupt
+	Interrupt,
 }
 
 /// Tells the STMPE1600 what value the interrupt output pin should be set to, when an interrupt is triggered.
@@ -107,7 +107,8 @@ pub enum InterruptPolarity {
 /// The different types of errors that can occur while interacting with the STMPE1600.
 #[derive(Debug)]
 pub enum Error<E>
-	where E: Debug
+where
+	E: Debug,
 {
 	/// I²C bus error
 	I2CError(E),
@@ -120,17 +121,22 @@ pub enum Error<E>
 /// A struct representing the STMPE1600 device driver.
 #[derive(Debug)]
 pub struct Stmpe1600<I2C> {
-	device: RefCell<Stmpe1600Device<I2C>>,
+	device: Stmpe1600Device<I2C>,
 	pins: [PinMode; 16],
 }
 
 impl<I2C, E> Stmpe1600<I2C>
-	where I2C: Read<Error = E> + Write<Error = E>, E: Debug
+where
+	I2C: Read<Error = E> + Write<Error = E>,
+	E: Debug,
 {
 	/// Gets the current state of the specified pin.
-	/// 
+	///
 	/// To get the state of all the pins at once, see [`get_all`](#method.get_all).
-	#[deprecated(since = "1.1.0", note = "Use the `Stmpe1600::pin` function instead to get a `Pin`, which implements the `embedded-hal` traits for GPIO pins.")]
+	#[deprecated(
+		since = "1.1.0",
+		note = "Use the `Stmpe1600::pin` function instead to get a `Pin`, which implements the `embedded-hal` traits for GPIO pins."
+	)]
 	pub fn get(&self, pin: u8) -> Result<bool, Error<E>> {
 		assert!(pin < 16);
 		let gpmr = self.device.borrow_mut().read_reg(Register::GPMR)?;
@@ -138,9 +144,12 @@ impl<I2C, E> Stmpe1600<I2C>
 	}
 
 	/// Gets the current state of the all pins.
-	/// 
+	///
 	/// To get the state a single pin, see [`get`](#method.get).
-	#[deprecated(since = "1.1.0", note = "Use the `Stmpe1600::pin` function instead to get a `Pin`, which implements the `embedded-hal` traits for GPIO pins.")]
+	#[deprecated(
+		since = "1.1.0",
+		note = "Use the `Stmpe1600::pin` function instead to get a `Pin`, which implements the `embedded-hal` traits for GPIO pins."
+	)]
 	pub fn get_all(&self) -> Result<[bool; 16], Error<E>> {
 		let mut device = self.device.borrow_mut();
 		let mut buf = [false; 16];
@@ -153,9 +162,12 @@ impl<I2C, E> Stmpe1600<I2C>
 	}
 
 	/// Sets the current state of the specified pin.
-	/// 
+	///
 	/// To set the state of all the pins at once, see [`set_all`](#method.set_all).
-	#[deprecated(since = "1.1.0", note = "Use the `Stmpe1600::pin` function instead to get a `Pin`, which implements the `embedded-hal` traits for GPIO pins.")]
+	#[deprecated(
+		since = "1.1.0",
+		note = "Use the `Stmpe1600::pin` function instead to get a `Pin`, which implements the `embedded-hal` traits for GPIO pins."
+	)]
 	pub fn set(&self, pin: u8, value: bool) -> Result<(), Error<E>> {
 		assert!(pin < 16);
 		let mut device = self.device.borrow_mut();
@@ -169,9 +181,12 @@ impl<I2C, E> Stmpe1600<I2C>
 	}
 
 	/// Sets the current state of the all the pins.
-	/// 
+	///
 	/// To set the state a single pin, see [`set`](#method.set).
-	#[deprecated(since = "1.1.0", note = "Use the `Stmpe1600::pin` function instead to get a `Pin`, which implements the `embedded-hal` traits for GPIO pins.")]
+	#[deprecated(
+		since = "1.1.0",
+		note = "Use the `Stmpe1600::pin` function instead to get a `Pin`, which implements the `embedded-hal` traits for GPIO pins."
+	)]
 	pub fn set_all(&self, mask: u16) -> Result<(), Error<E>> {
 		self.device.borrow_mut().write_reg(Register::GPSR, mask)
 	}
@@ -185,10 +200,10 @@ impl<I2C, E> Stmpe1600<I2C>
 	}
 
 	/// Gets the pending interrupts and returns them in an array.
-	/// 
+	///
 	/// This function clears any pending bits from the STMPE1600,
 	/// and in doing so, stops triggering the interrupt output pin.
 	pub fn get_interrupts(&self) -> Result<[bool; 16], Error<E>> {
-		self.device.borrow_mut().get_interrupts()	
+		self.device.borrow_mut().get_interrupts()
 	}
 }

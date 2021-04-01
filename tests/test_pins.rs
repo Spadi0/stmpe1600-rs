@@ -1,6 +1,6 @@
-use stmpe1600::{DEFAULT_ADDRESS, PinMode, Register, Stmpe1600Builder};
 use embedded_hal::digital::v2::{InputPin, OutputPin};
 use embedded_hal_mock::i2c::{Mock as I2cMock, Transaction as I2cTransaction};
+use stmpe1600::{PinMode, Register, Stmpe1600Builder, DEFAULT_ADDRESS};
 
 #[test]
 fn read_pin() {
@@ -10,13 +10,14 @@ fn read_pin() {
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::SystemControl as u8, 0x80]),
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::GPDR as u8, 0x00, 0x00]),
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::IEGPIOR as u8, 0x00, 0x00]),
-
 		// read pin operation
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::GPMR as u8]),
 		I2cTransaction::read(DEFAULT_ADDRESS, vec![0x01, 0x00]),
 	];
 	let i2c = I2cMock::new(&expectations);
-	let stmpe1600 = Stmpe1600Builder::new(i2c).build().expect("Failed to initialise STMPE1600 driver");
+	let stmpe1600 = Stmpe1600Builder::new(i2c)
+		.build()
+		.expect("Failed to initialise STMPE1600 driver");
 
 	let input_pin = stmpe1600.pin(0);
 	let is_high = input_pin.is_high().unwrap();
@@ -31,11 +32,10 @@ fn write_pin() {
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::SystemControl as u8, 0x80]),
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::GPDR as u8, 0x01, 0x00]),
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::IEGPIOR as u8, 0x00, 0x00]),
-
 		// write pin operation
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::GPSR as u8]),
 		I2cTransaction::read(DEFAULT_ADDRESS, vec![0x00, 0x00]),
-		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::GPSR as u8, 0x01, 0x00])
+		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::GPSR as u8, 0x01, 0x00]),
 	];
 	let i2c = I2cMock::new(&expectations);
 	let stmpe1600 = Stmpe1600Builder::new(i2c)
@@ -56,10 +56,9 @@ fn read_from_output_pin() {
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::SystemControl as u8, 0x80]),
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::GPDR as u8, 0x01, 0x00]),
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::IEGPIOR as u8, 0x00, 0x00]),
-
 		// write pin operation
 		I2cTransaction::read(DEFAULT_ADDRESS, vec![Register::GPSR as u8]),
-		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::GPSR as u8, 0x01, 0x00])
+		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::GPSR as u8, 0x01, 0x00]),
 	];
 	let i2c = I2cMock::new(&expectations);
 	let stmpe1600 = Stmpe1600Builder::new(i2c)

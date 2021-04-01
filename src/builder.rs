@@ -2,9 +2,9 @@ use core::cell::RefCell;
 use core::fmt::Debug;
 use core::iter::IntoIterator;
 
-use embedded_hal::blocking::i2c::{Read, Write};
-use crate::{DEFAULT_ADDRESS, Error, InterruptPolarity, PinMode, Stmpe1600};
 use crate::device::{Register, Stmpe1600Device};
+use crate::{Error, InterruptPolarity, PinMode, Stmpe1600, DEFAULT_ADDRESS};
+use embedded_hal::blocking::i2c::{Read, Write};
 
 /// A builder that allows for configuring all the various options available to edit on the STMPE1600.
 pub struct Stmpe1600Builder<I2C> {
@@ -16,7 +16,9 @@ pub struct Stmpe1600Builder<I2C> {
 }
 
 impl<I2C, E> Stmpe1600Builder<I2C>
-	where I2C: Read<Error = E> + Write<Error = E>, E: Debug
+where
+	I2C: Read<Error = E> + Write<Error = E>,
+	E: Debug,
 {
 	/// Constructs a builder.
 	pub fn new(i2c: I2C) -> Stmpe1600Builder<I2C> {
@@ -36,7 +38,7 @@ impl<I2C, E> Stmpe1600Builder<I2C>
 	}
 
 	/// Sets the mode of the specified pin. Defaults to [`Input`](enum.PinMode.html#variant.Input).
-	/// 
+	///
 	/// To edit multiple pins at once, see [`pins`](#method.pins).
 	pub fn pin(mut self, pin: u8, mode: PinMode) -> Stmpe1600Builder<I2C> {
 		self.set_pin(pin, mode);
@@ -44,10 +46,11 @@ impl<I2C, E> Stmpe1600Builder<I2C>
 	}
 
 	/// Sets the mode of multiple pins at once. Defaults to [`Input`](enum.PinMode.html#variant.Input).
-	/// 
+	///
 	/// To edit a single pin, see [`pin`](#method.pin).
 	pub fn pins<I>(mut self, pins: I, mode: PinMode) -> Stmpe1600Builder<I2C>
-		where I: IntoIterator<Item = u8>
+	where
+		I: IntoIterator<Item = u8>,
 	{
 		for pin in pins {
 			self.set_pin(pin, mode);
@@ -61,7 +64,6 @@ impl<I2C, E> Stmpe1600Builder<I2C>
 		self.interrupt_polarity = polarity;
 		self
 	}
-
 
 	/// Consumes the builder, and produces an [`Stmpe1600`](struct.Stmpe1600.html) struct.
 	pub fn build(self) -> Result<Stmpe1600<I2C>, Error<E>> {

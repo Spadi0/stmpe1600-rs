@@ -1,5 +1,5 @@
-use stmpe1600::{DEFAULT_ADDRESS, PinMode, Register, Stmpe1600Builder};
 use embedded_hal_mock::i2c::{Mock as I2cMock, Transaction as I2cTransaction};
+use stmpe1600::{PinMode, Register, Stmpe1600Builder, DEFAULT_ADDRESS};
 
 #[test]
 fn basic_builder() {
@@ -11,7 +11,9 @@ fn basic_builder() {
 		I2cTransaction::write(DEFAULT_ADDRESS, vec![Register::IEGPIOR as u8, 0x00, 0x00]),
 	];
 	let i2c = I2cMock::new(&expectations);
-	let _stmpe1600 = Stmpe1600Builder::new(i2c).build().expect("Failed to initialise STMPE1600 driver");
+	let _stmpe1600 = Stmpe1600Builder::new(i2c)
+		.build()
+		.expect("Failed to initialise STMPE1600 driver");
 }
 
 #[test]
