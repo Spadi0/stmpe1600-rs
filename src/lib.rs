@@ -106,10 +106,7 @@ pub enum InterruptPolarity {
 
 /// The different types of errors that can occur while interacting with the STMPE1600.
 #[derive(Debug)]
-pub enum Error<E>
-where
-	E: Debug,
-{
+pub enum Error<E> {
 	/// I²C bus error
 	I2CError(E),
 	/// Invalid device ID
