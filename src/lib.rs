@@ -85,10 +85,10 @@ enum PinMode {
 	Interrupt,
 }
 
-/// Tells the STMPE1600 what value the interrupt output pin should be set to, when an interrupt is triggered.
+/// Input/Interrupt polarity.
 #[allow(missing_docs)]
-#[derive(Clone, Copy, Debug)]
-pub enum InterruptPolarity {
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Polarity {
 	Low,
 	High,
 }

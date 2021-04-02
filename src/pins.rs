@@ -1,4 +1,4 @@
-use crate::{Error, PinMode, Register, Stmpe1600};
+use crate::{Error, PinMode, Polarity, Register, Stmpe1600};
 use core::marker::PhantomData;
 use embedded_hal::blocking::i2c::{Read, Write};
 use embedded_hal::digital::v2::{InputPin, OutputPin};
@@ -36,6 +36,29 @@ where
 			pin,
 			_phantom: PhantomData,
 		}
+	}
+
+	/// Get the polarity inversion of the current pin.
+	pub fn polarity_inversion(&mut self) -> Result<Polarity, Error<E>> {
+		let mut dev = self.driver.device.borrow_mut();
+		let gppir = dev.read_reg(Register::GPPIR)?;
+		if gppir & (1 << self.pin) == (1 << self.pin) {
+			Ok(Polarity::High)
+		} else {
+			Ok(Polarity::Low)
+		}
+	}
+
+	/// Set the polarity inversion of the current pin.
+	pub fn set_polarity_inversion(&mut self, polarity: Polarity) -> Result<(), Error<E>> {
+		let mut dev = self.driver.device.borrow_mut();
+		let mut gppir = dev.read_reg(Register::GPPIR)?;
+		match polarity {
+			Polarity::Low => gppir &= !(1 << self.pin),
+			Polarity::High => gppir |= 1 << self.pin,
+		}
+		dev.write_reg(Register::GPPIR, gppir)?;
+		Ok(())
 	}
 }
 

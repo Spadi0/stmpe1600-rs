@@ -1,5 +1,5 @@
 use crate::device::{Register, Stmpe1600Device};
-use crate::{Error, InterruptPolarity, PinMode, Stmpe1600, DEFAULT_ADDRESS};
+use crate::{Error, PinMode, Polarity, Stmpe1600, DEFAULT_ADDRESS};
 use core::cell::RefCell;
 use embedded_hal::blocking::i2c::{Read, Write};
 
@@ -8,7 +8,7 @@ pub struct Stmpe1600Builder<I2C> {
 	i2c: I2C,
 	pins: [PinMode; 16],
 	address: u8,
-	interrupt_polarity: Option<InterruptPolarity>,
+	interrupt_polarity: Option<Polarity>,
 }
 
 impl<I2C, E> Stmpe1600Builder<I2C>
@@ -32,7 +32,7 @@ where
 	}
 
 	/// Enables interrupts, and sets the polarity of the interrupt output pin.
-	pub fn interrupts(mut self, polarity: InterruptPolarity) -> Stmpe1600Builder<I2C> {
+	pub fn interrupts(mut self, polarity: Polarity) -> Stmpe1600Builder<I2C> {
 		self.interrupt_polarity = Some(polarity);
 		self
 	}
@@ -44,8 +44,8 @@ where
 		if let Some(polarity) = self.interrupt_polarity {
 			let scb = device.read_reg8(Register::SystemControl)?;
 			let polarity = match polarity {
-				InterruptPolarity::Low => 0x00,
-				InterruptPolarity::High => 0x01,
+				Polarity::Low => 0x00,
+				Polarity::High => 0x01,
 			};
 			device.write_reg8(Register::SystemControl, scb | 0x04 | polarity)?;
 		}

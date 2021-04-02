@@ -8,6 +8,7 @@ This is a platform-agnostic Rust driver for the [STMPE1600 I/O expander](https:/
 This driver can:
 - Setup the pins as input, output or interrupt pins.
 - Read/write to a specific pin.
+- Set the polarity inversion of a specific pin.
 - Enable interrupt capability.
 - Set the interrupt output polarity.
 
@@ -19,11 +20,6 @@ get any pending interrupts by calling `get_interrupts`, which will also clear th
 
 ## Usage
 See [docs](https://docs.rs/stmpe1600).
-
-## To-Do
-- [X] Add interrupt polarity
-- [X] Create a way to access each of the pins individually
-- [X] Implement [embedded_hal](https://github.com/rust-embedded/embedded-hal) InputPin and OutputPin traits
 
 ## License
 
