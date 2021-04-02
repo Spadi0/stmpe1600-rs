@@ -96,19 +96,11 @@ where
 	type Error = Error<E>;
 
 	fn is_low(&self) -> Result<bool, Self::Error> {
-		if self.driver.pins.borrow()[self.pin as usize] == PinMode::Output {
-			return Err(Error::IncorrectPinMode);
-		}
-
 		let mask = self.driver.device.borrow_mut().read_reg(Register::GPMR)?;
 		Ok(mask & (1 << self.pin) == 0)
 	}
 
 	fn is_high(&self) -> Result<bool, Self::Error> {
-		if self.driver.pins.borrow()[self.pin as usize] == PinMode::Output {
-			return Err(Error::IncorrectPinMode);
-		}
-
 		let mask = self.driver.device.borrow_mut().read_reg(Register::GPMR)?;
 		Ok(mask & (1 << self.pin) == 1 << self.pin)
 	}
@@ -151,10 +143,6 @@ where
 	type Error = Error<E>;
 
 	fn set_low(&mut self) -> Result<(), Self::Error> {
-		if self.driver.pins.borrow_mut()[self.pin as usize] != PinMode::Output {
-			return Err(Error::IncorrectPinMode);
-		}
-
 		let mask = self.driver.device.borrow_mut().read_reg(Register::GPSR)?;
 		self.driver
 			.device
@@ -163,10 +151,6 @@ where
 	}
 
 	fn set_high(&mut self) -> Result<(), Self::Error> {
-		if self.driver.pins.borrow_mut()[self.pin as usize] != PinMode::Output {
-			return Err(Error::IncorrectPinMode);
-		}
-
 		let mask = self.driver.device.borrow_mut().read_reg(Register::GPSR)?;
 		self.driver
 			.device
@@ -212,19 +196,11 @@ where
 	type Error = Error<E>;
 
 	fn is_low(&self) -> Result<bool, Self::Error> {
-		if self.driver.pins.borrow()[self.pin as usize] == PinMode::Output {
-			return Err(Error::IncorrectPinMode);
-		}
-
 		let mask = self.driver.device.borrow_mut().read_reg(Register::GPMR)?;
 		Ok(mask & (1 << self.pin) == 0)
 	}
 
 	fn is_high(&self) -> Result<bool, Self::Error> {
-		if self.driver.pins.borrow()[self.pin as usize] == PinMode::Output {
-			return Err(Error::IncorrectPinMode);
-		}
-
 		let mask = self.driver.device.borrow_mut().read_reg(Register::GPMR)?;
 		Ok(mask & (1 << self.pin) == 1 << self.pin)
 	}

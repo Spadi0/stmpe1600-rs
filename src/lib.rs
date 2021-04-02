@@ -100,8 +100,6 @@ pub enum Error<E> {
 	I2CError(E),
 	/// Invalid device ID
 	InvalidDeviceID,
-	/// Attmepted to get the value of an output, or set the value of an input or an interrupt
-	IncorrectPinMode,
 }
 
 /// A struct representing the STMPE1600 device driver.
