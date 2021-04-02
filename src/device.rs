@@ -35,7 +35,6 @@ pub(crate) struct Stmpe1600Device<I2C> {
 impl<I2C, E> Stmpe1600Device<I2C>
 where
 	I2C: Read<Error = E> + Write<Error = E>,
-	E: Debug,
 {
 	pub fn new(i2c: I2C, address: u8) -> Result<Stmpe1600Device<I2C>, Error<E>> {
 		let mut device = Stmpe1600Device { i2c, address };
