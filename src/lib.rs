@@ -41,15 +41,15 @@
 //! ```rust,ignore
 //! use embedded_hal::digital::v2::{InputPin, OutputPin};
 //! use linux_embedded_hal::I2cdev;
-//! use stmpe1600::{PinMode, Stmpe1600Builder};
+//! use stmpe1600::Stmpe1600Builder;
 //!
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let stmpe1600 = Stmpe1600Builder::new(dev)
 //! 	.build()
 //! 	.expect("Could not initialise STMPE1600 driver");
 //!
-//! let input_pin = stmpe1600.pin_input(0);
-//! let output_pin = stmpe1600.pin_output(1);
+//! let mut input_pin = stmpe1600.pin_input(0);
+//! let mut output_pin = stmpe1600.pin_output(1);
 //!
 //! if input_pin.is_high()? {
 //! 	output_pin.set_high()?

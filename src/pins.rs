@@ -20,6 +20,45 @@ use modes::*;
 /// Input and interrupt pins implement the trait [`embedded_hal::digital::v2::InputPin`], and output
 /// pins implement [`embedded_hal::digital::v2::OutputPin`]. This means that the pins on the I/O
 /// expander can be used by platform agnostic drivers as if they were regular GPIO pins.
+///
+/// # Examples
+///
+/// ## Changing pin mode
+/// ```rust,ignore
+/// use embedded_hal::digital::v2::{InputPin, OutputPin};
+/// use linux_embedded_hal::I2cdev;
+/// use stmpe1600::Stmpe1600Builder;
+///
+/// # fn main() -> Result<(), stmpe1600::Error<linux_embedded_hal::i2cdev::linux::LinuxI2CError>> {
+/// let dev = I2cdev::new("/dev/i2c-1").unwrap();
+/// let stmpe1600 = Stmpe1600Builder::new(dev)
+/// 	.build()
+/// 	.expect("Could not initialise STMPE1600 driver");
+///
+/// let mut input_pin = stmpe1600.pin_input(0)?;
+/// let _ = input_pin.is_high()?;
+/// let mut output_pin = input_pin.into_output_pin()?;
+/// output_pin.set_high()?;
+/// # Ok(())
+/// # }
+/// ```
+///
+/// ## Setting interrupt polarity
+/// ```rust,ignore
+/// use linux_embedded_hal::I2cdev;
+/// use stmpe1600::{Polarity, Stmpe1600Builder};
+///
+/// # fn main() -> Result<(), stmpe1600::Error<linux_embedded_hal::i2cdev::linux::LinuxI2CError>> {
+/// let dev = I2cdev::new("/dev/i2c-1").unwrap();
+/// let stmpe1600 = Stmpe1600Builder::new(dev)
+/// 	.build()
+/// 	.expect("Could not initialise STMPE1600 driver");
+///
+/// let mut input_pin = stmpe1600.pin_input(0)?;
+/// input_pin.set_interrupt_polarity(Polarity::High)?;
+/// # Ok(())
+/// # }
+/// ```
 pub struct Pin<'a, I2C, MODE> {
 	driver: &'a Stmpe1600<I2C>,
 	pin: u8,
